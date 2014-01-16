@@ -28,30 +28,18 @@
 #
 ### ### ### PLITC ### ### ###
 
+FILE="./adds-nsupdate.txt"
+CONFIG="./do-nsupdate.conf"
 
-### <--- CONFIGURE ---
-
-KERBEROSADMINUSER="dnsadmins-user@DC.DOMAIN.TLD"
-
-ADMACHINENAME="maschine.dc.domain.tld"
-ADSERVERNAME="dc.domain.tld"
-ADSERVERZONE="dc.domain.tld"
-ADMACHINETTL="3600"
-
-INTERFACE="wlan0"
-
-### --- CONFIGURE --->
-
-
-###
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-###
+SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
+SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
+SADSERVERNAME=$(grep "ADSERVERNAME" $CONFIG | /usr/bin/awk '{print $3}')
+SADSERVERZONE=$(grep "ADSERVERZONE" $CONFIG | /usr/bin/awk '{print $3}')
+SINTERFACE=$(grep "INTERFACE" $CONFIG | /usr/bin/awk '{print $3}')
 
 ### ADMACHINENAME=$(hostname -f)
-IPV4=$(ifconfig $INTERFACE | grep "broadcast" | /usr/bin/awk '{print $2}' | head -n1)
-IPV6=$(ifconfig $INTERFACE | grep "autoconf" | /usr/bin/awk '{print $2}' | head -n1)
-
-FILE="adds-nsupdate.txt"
+IPV4=$(ifconfig $SINTERFACE | grep "broadcast" | /usr/bin/awk '{print $2}' | head -n1)
+IPV6=$(ifconfig $SINTERFACE | grep "autoconf" | /usr/bin/awk '{print $2}' | head -n1)
 
 KERBEROSINIT=$(which kinit)
 
@@ -154,20 +142,20 @@ fi
 
 ### <--- --- ---> ###
 
-/usr/bin/kinit $KERBEROSADMINUSER
+/usr/bin/kinit $SKERBEROSADMINUSER
 
-> ./adds-nsupdate.txt
-/bin/echo "server $ADSERVERNAME" >> ./adds-nsupdate.txt
-/bin/echo "zone $ADSERVERZONE" >> ./adds-nsupdate.txt
+> $FILE
+/bin/echo "server $SADSERVERNAME" >> $FILE
+/bin/echo "zone $SADSERVERZONE" >> $FILE
 
-/bin/echo "update delete $ADMACHINENAME. A" >> ./adds-nsupdate.txt
-/bin/echo "update add $ADMACHINENAME. $ADMACHINETTL A $IPV4" >> ./adds-nsupdate.txt
+/bin/echo "update delete $SADMACHINENAME. A" >> $FILE
+/bin/echo "update add $SADMACHINENAME. $SADMACHINETTL A $IPV4" >> $FILE
 
-/bin/echo "update delete $ADMACHINENAME. AAAA" >> ./adds-nsupdate.txt
-/bin/echo "update add $ADMACHINENAME. $ADMACHINETTL AAAA $IPV6" >> ./adds-nsupdate.txt
+/bin/echo "update delete $SADMACHINENAME. AAAA" >> $FILE
+/bin/echo "update add $SADMACHINENAME. $SADMACHINETTL AAAA $IPV6" >> $FILE
 
-/bin/echo "show" >> ./adds-nsupdate.txt
-/bin/echo "send" >> ./adds-nsupdate.txt
+/bin/echo "show" >> $FILE
+/bin/echo "send" >> $FILE
 
 ### <--- --- ---> ###
 

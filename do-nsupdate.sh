@@ -35,6 +35,7 @@ SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}
 SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
 SADSERVERNAME=$(grep "ADSERVERNAME" $CONFIG | /usr/bin/awk '{print $3}')
 SADSERVERZONE=$(grep "ADSERVERZONE" $CONFIG | /usr/bin/awk '{print $3}')
+SADMACHINETTL=$(grep "ADMACHINETTL" $CONFIG | /usr/bin/awk '{print $3}')
 SINTERFACE=$(grep "INTERFACE" $CONFIG | /usr/bin/awk '{print $3}')
 
 ### ADMACHINENAME=$(hostname -f)

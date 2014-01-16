@@ -38,11 +38,11 @@ SADSERVERZONE=$(grep "ADSERVERZONE" $CONFIG | /usr/bin/awk '{print $3}')
 SADMACHINETTL=$(grep "ADMACHINETTL" $CONFIG | /usr/bin/awk '{print $3}')
 SINTERFACE=$(grep "INTERFACE" $CONFIG | /usr/bin/awk '{print $3}')
 
-### ADMACHINENAME=$(hostname -f)
+### SADMACHINENAME=$(hostname -f)
 IPV4=$(ifconfig $SINTERFACE | grep "broadcast" | /usr/bin/awk '{print $2}' | head -n1)
 IPV6=$(ifconfig $SINTERFACE | grep "autoconf" | /usr/bin/awk '{print $2}' | head -n1)
 
-KERBEROSINIT=$(which kinit)
+SKERBEROSINIT=$(which kinit)
 
 ###
 
@@ -108,7 +108,7 @@ fi
 
 ###
 
-if [ $KERBEROSINIT = /usr/bin/kinit ]; then
+if [ $SKERBEROSINIT = /usr/bin/kinit ]; then
    # Kerberos installed
 else
    echo "Kerberos Client Package not found..."

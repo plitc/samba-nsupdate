@@ -28,8 +28,343 @@
 #
 ### ### ### PLITC ### ### ###
 
-FILE="./adds-nsupdate.txt"
-CONFIG="./do-nsupdate.conf"
+case $(uname) in
+Linux)
+    # echo "Linux"
+### ### ### ### ### ### ### ### ###
+cat << 'EOFLINUX' > /tmp/do-nsupdate-linux.sh
+#!/bin/sh
+{
+FILE="/ADDS/do-nsupdate.txt"
+CONFIG="/ADDS/do-nsupdate.conf"
+
+SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
+SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
+SADSERVERNAME=$(grep "ADSERVERNAME" $CONFIG | /usr/bin/awk '{print $3}')
+SADSERVERZONE=$(grep "ADSERVERZONE" $CONFIG | /usr/bin/awk '{print $3}')
+SADMACHINETTL=$(grep "ADMACHINETTL" $CONFIG | /usr/bin/awk '{print $3}')
+SINTERFACE=$(grep "INTERFACE" $CONFIG | /usr/bin/awk '{print $3}')
+
+### SADMACHINENAME=$(hostname -f)
+IPV4=$(ifconfig $SINTERFACE | grep "broadcast" | /usr/bin/awk '{print $2}' | head -n1)
+IPV6=$(ifconfig $SINTERFACE | grep "autoconf" | /usr/bin/awk '{print $2}' | head -n1)
+
+SKERBEROSINIT=$(which kinit)
+
+###
+
+case $(uname) in
+Linux)
+    # echo "Linux"
+    ;;
+Darwin)
+    # echo "Mac"
+    ;;
+FreeBSD)
+    # echo "FreeBSD"
+    ;;
+*)
+    # error 1
+    echo "ERROR: Plattform=unknown"
+    exit 0
+    ;;
+esac
+
+###
+
+if [ -f /usr/sbin/samba_dnsupdate ]; then
+   # Debian derived
+   #
+elif [ -f /usr/bin/nsupdate ]; then
+   # Mac
+   #
+elif [ -f /usr/local/bin/samba-nsupdate ]; then
+   # FreeBSD
+   #
+else
+   echo "Samba / DNSUpdate Package not found..."
+   echo "Do you want install it? n/j:"
+   {
+   read answer
+   # echo "allright: $answer"
+   # if [ "$answer" = "j" ]
+   if [ "$answer" != "n" ]
+      then
+      {
+      case $(uname) in
+      Linux)
+         # echo "Linux"
+         sudo apt-get install samba dnsutils
+      ;;
+      Darwin)
+         # echo "Mac"
+      ;;
+      FreeBSD)
+         # echo "FreeBSD"
+         sudo pkg_add -r samba4 samba-nsupdate
+      ;;
+      esac
+      }
+   else
+      echo ""
+      echo "Have a nice day"
+      exit 0
+   fi
+   }
+fi
+ 
+###
+
+if [ $SKERBEROSINIT = /usr/bin/kinit ]; then
+   # Kerberos installed
+else
+   echo "Kerberos Client Package not found..."
+   echo "Do you want install it? n/j:"
+   {
+   read answer
+   # echo "allright: $answer"
+   # if [ "$answer" = "j" ]
+   if [ "$answer" != "n" ]
+      then
+      {
+      case $(uname) in
+      Linux)
+         # echo "Linux"
+         sudo apt-get install krb5-user krb5-clients
+      ;;
+      Darwin)
+         # echo "Mac"
+      ;;
+      FreeBSD)
+         # echo "FreeBSD"
+      ;;
+      esac
+      }
+   else
+      echo ""
+      echo "Have a nice day"
+      exit 0
+   fi
+   }
+fi
+ 
+### <--- --- ---> ###
+
+/usr/bin/kinit $SKERBEROSADMINUSER
+
+> $FILE
+/bin/echo "server $SADSERVERNAME" >> $FILE
+/bin/echo "zone $SADSERVERZONE" >> $FILE
+
+/bin/echo "update delete $SADMACHINENAME. A" >> $FILE
+/bin/echo "update add $SADMACHINENAME. $SADMACHINETTL A $IPV4" >> $FILE
+
+/bin/echo "update delete $SADMACHINENAME. AAAA" >> $FILE
+/bin/echo "update add $SADMACHINENAME. $SADMACHINETTL AAAA $IPV6" >> $FILE
+
+/bin/echo "show" >> $FILE
+/bin/echo "send" >> $FILE
+
+### <--- --- ---> ###
+
+echo ""
+
+case $(uname) in
+Linux)
+    # echo "Linux"
+    /usr/bin/nsupdate -g -v $FILE
+    ;;
+Darwin)
+    # echo "Mac"
+    /usr/bin/nsupdate -g -v $FILE
+    ;;
+FreeBSD)
+    # echo "FreeBSD"
+    /usr/local/bin/samba-nsupdate -g -v $FILE
+    ;;
+esac
+
+exit 0
+
+}
+EOFLINUX
+
+chmod 775 /tmp/do-nsupdate-linux.sh
+exec /tmp/do-nsupdate-linux.sh
+### ### ### ### ### ### ### ### ###
+    ;;
+Darwin)
+    # echo "Mac"
+### ### ### ### ### ### ### ### ###
+cat << 'EOFMAC' > /tmp/do-nsupdate-mac.sh
+#!/bin/sh
+{
+FILE="/ADDS/do-nsupdate.txt"
+CONFIG="/ADDS/do-nsupdate.conf"
+
+SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
+SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
+SADSERVERNAME=$(grep "ADSERVERNAME" $CONFIG | /usr/bin/awk '{print $3}')
+SADSERVERZONE=$(grep "ADSERVERZONE" $CONFIG | /usr/bin/awk '{print $3}')
+SADMACHINETTL=$(grep "ADMACHINETTL" $CONFIG | /usr/bin/awk '{print $3}')
+SINTERFACE=$(grep "INTERFACE" $CONFIG | /usr/bin/awk '{print $3}')
+
+### SADMACHINENAME=$(hostname -f)
+IPV4=$(ifconfig $SINTERFACE | grep "broadcast" | /usr/bin/awk '{print $2}' | head -n1)
+IPV6=$(ifconfig $SINTERFACE | grep "autoconf" | /usr/bin/awk '{print $2}' | head -n1)
+
+SKERBEROSINIT=$(which kinit)
+
+###
+
+case $(uname) in
+Linux)
+    # echo "Linux"
+    ;;
+Darwin)
+    # echo "Mac"
+    ;;
+FreeBSD)
+    # echo "FreeBSD"
+    ;;
+*)
+    # error 1
+    echo "ERROR: Plattform=unknown"
+    exit 0
+    ;;
+esac
+
+###
+
+if [ -f /usr/sbin/samba_dnsupdate ]; then
+   # Debian derived
+   #
+elif [ -f /usr/bin/nsupdate ]; then
+   # Mac
+   #
+elif [ -f /usr/local/bin/samba-nsupdate ]; then
+   # FreeBSD
+   #
+else
+   echo "Samba / DNSUpdate Package not found..."
+   echo "Do you want install it? n/j:"
+   {
+   read answer
+   # echo "allright: $answer"
+   # if [ "$answer" = "j" ]
+   if [ "$answer" != "n" ]
+      then
+      {
+      case $(uname) in
+      Linux)
+         # echo "Linux"
+         sudo apt-get install samba dnsutils
+      ;;
+      Darwin)
+         # echo "Mac"
+      ;;
+      FreeBSD)
+         # echo "FreeBSD"
+         sudo pkg_add -r samba4 samba-nsupdate
+      ;;
+      esac
+      }
+   else
+      echo ""
+      echo "Have a nice day"
+      exit 0
+   fi
+   }
+fi
+ 
+###
+
+if [ $SKERBEROSINIT = /usr/bin/kinit ]; then
+   # Kerberos installed
+else
+   echo "Kerberos Client Package not found..."
+   echo "Do you want install it? n/j:"
+   {
+   read answer
+   # echo "allright: $answer"
+   # if [ "$answer" = "j" ]
+   if [ "$answer" != "n" ]
+      then
+      {
+      case $(uname) in
+      Linux)
+         # echo "Linux"
+         sudo apt-get install krb5-user krb5-clients
+      ;;
+      Darwin)
+         # echo "Mac"
+      ;;
+      FreeBSD)
+         # echo "FreeBSD"
+      ;;
+      esac
+      }
+   else
+      echo ""
+      echo "Have a nice day"
+      exit 0
+   fi
+   }
+fi
+ 
+### <--- --- ---> ###
+
+/usr/bin/kinit $SKERBEROSADMINUSER
+
+> $FILE
+/bin/echo "server $SADSERVERNAME" >> $FILE
+/bin/echo "zone $SADSERVERZONE" >> $FILE
+
+/bin/echo "update delete $SADMACHINENAME. A" >> $FILE
+/bin/echo "update add $SADMACHINENAME. $SADMACHINETTL A $IPV4" >> $FILE
+
+/bin/echo "update delete $SADMACHINENAME. AAAA" >> $FILE
+/bin/echo "update add $SADMACHINENAME. $SADMACHINETTL AAAA $IPV6" >> $FILE
+
+/bin/echo "show" >> $FILE
+/bin/echo "send" >> $FILE
+
+### <--- --- ---> ###
+
+echo ""
+
+case $(uname) in
+Linux)
+    # echo "Linux"
+    /usr/bin/nsupdate -g -v $FILE
+    ;;
+Darwin)
+    # echo "Mac"
+    /usr/bin/nsupdate -g -v $FILE
+    ;;
+FreeBSD)
+    # echo "FreeBSD"
+    /usr/local/bin/samba-nsupdate -g -v $FILE
+    ;;
+esac
+
+exit 0
+
+}
+EOFMAC
+
+chmod 775 /tmp/do-nsupdate-mac.sh
+exec /tmp/do-nsupdate-mac.sh
+### ### ### ### ### ### ### ### ###
+    ;;
+FreeBSD)
+    # echo "FreeBSD"
+### ### ### ### ### ### ### ### ###
+cat << 'EOFFREEBSD' > /tmp/do-nsupdate-freebsd.sh
+#!/bin/sh
+{
+FILE="/ADDS/do-nsupdate.txt"
+CONFIG="/ADDS/do-nsupdate.conf"
 
 SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
 SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
@@ -179,5 +514,20 @@ esac
 
 exit 0
 
-### ### ### PLITC ### ### ###
+}
+EOFFREEBSD
+
+chmod 775 /tmp/do-nsupdate-freebsd.sh
+exec /tmp/do-nsupdate-freebsd.sh
+### ### ### ### ### ### ### ### ###
+    ;;
+*)
+    # error 1
+    echo "ERROR: Plattform=unknown"
+    exit 0
+    ;;
+esac
+
+exit 0
+
 # EOF

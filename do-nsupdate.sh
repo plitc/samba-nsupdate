@@ -61,7 +61,7 @@ case $(uname) in
 Linux)
     # echo "Linux"
     ;;
-Mac)
+Darwin)
     # echo "Mac"
     ;;
 FreeBSD)
@@ -100,7 +100,7 @@ else
          # echo "Linux"
          sudo apt-get install samba dnsutils
       ;;
-      Mac)
+      Darwin)
          # echo "Mac"
       ;;
       FreeBSD)
@@ -136,7 +136,7 @@ else
          # echo "Linux"
          sudo apt-get install krb5-user krb5-clients
       ;;
-      Mac)
+      Darwin)
          # echo "Mac"
       ;;
       FreeBSD)
@@ -178,7 +178,7 @@ Linux)
     # echo "Linux"
     /usr/bin/nsupdate -g -v $FILE
     ;;
-Mac)
+Darwin)
     # echo "Mac"
     /usr/bin/nsupdate -g -v $FILE
     ;;

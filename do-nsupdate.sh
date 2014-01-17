@@ -347,6 +347,7 @@ LINUXEOF
 chmod 775 /tmp/do-nsupdate-linux.sh
 exec /tmp/do-nsupdate-linux.sh
 ### --- --- --- --- --- --- --- ###
+    ;;
 *)
     # error 1
     echo "ERROR: Plattform = unknown"

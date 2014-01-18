@@ -66,6 +66,7 @@ if [ -f /usr/local/bin/samba-nsupdate ]; then
    ### FreeBSD ###
    echo ""
 else
+   echo ""
    echo "Samba / DNSUpdate Package not found..."
    echo "Do you want install it? n/j:"
    {
@@ -94,6 +95,7 @@ if [ $SKERBEROSINIT = /usr/bin/kinit ]; then
    # Kerberos installed
    echo ""
 else
+   echo ""
    echo "Kerberos Client Package not found..."
    echo "Do you want install it? n/j:"
    {
@@ -258,10 +260,40 @@ Linux)
     ;;
 esac
 
+if [ -f /usr/bin/sudo ]; then
+   # Debian derived
+   echo ""
+else
+   echo ""
+   echo "Sudo Package not found..."
+   echo "Do you want install it? n/j:"
+   {
+   read answer
+   # echo "allright: $answer"
+   # if [ "$answer" = "j" ]
+   if [ "$answer" != "n" ]
+      then
+      { 
+      case $(uname) in
+      Linux)
+         ### Linux ###
+         apt-get install sudo
+      ;;
+      esac
+      }
+   else 
+      echo ""
+      echo "Have a nice day"
+      exit 0
+   fi
+   }
+fi
+
 if [ -f /usr/sbin/samba_dnsupdate ]; then
    # Debian derived
    echo ""
 else
+   echo ""
    echo "Samba / DNSUpdate Package not found..."
    echo "Do you want install it? n/j:"
    {
@@ -290,6 +322,7 @@ if [ $SKERBEROSINIT = /usr/bin/kinit ]; then
    # Kerberos installed
    echo ""
 else
+   echo ""
    echo "Kerberos Client Package not found..."
    echo "Do you want install it? n/j:"
    {

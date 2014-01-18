@@ -289,6 +289,35 @@ else
    }
 fi
 
+if [ -f /sbin/ifconfig ]; then
+   # Debian derived
+   echo ""
+else
+   echo ""
+   echo "ifconfig Package not found..."
+   echo "Do you want install it? n/j:"
+   {
+   read answer
+   # echo "allright: $answer"
+   # if [ "$answer" = "j" ]
+   if [ "$answer" != "n" ]
+      then
+      {  
+      case $(uname) in
+      Linux)
+         ### Linux ###
+         sudo apt-get install ifconfig
+      ;; 
+      esac
+      }
+   else
+      echo ""
+      echo "Have a nice day"
+      exit 0
+   fi
+   }
+fi
+
 if [ -f /etc/init.d/samba ]; then
    # Debian derived
    echo ""

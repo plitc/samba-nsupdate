@@ -64,6 +64,7 @@ esac
 
 if [ -f /usr/local/bin/samba-nsupdate ]; then
    ### FreeBSD ###
+   echo ""
 else
    echo "Samba / DNSUpdate Package not found..."
    echo "Do you want install it? n/j:"
@@ -91,6 +92,7 @@ fi
  
 if [ $SKERBEROSINIT = /usr/bin/kinit ]; then
    # Kerberos installed
+   echo ""
 else
    echo "Kerberos Client Package not found..."
    echo "Do you want install it? n/j:"
@@ -258,6 +260,7 @@ esac
 
 if [ -f /usr/sbin/samba_dnsupdate ]; then
    # Debian derived
+   echo ""
 else
    echo "Samba / DNSUpdate Package not found..."
    echo "Do you want install it? n/j:"
@@ -285,6 +288,7 @@ fi
  
 if [ $SKERBEROSINIT = /usr/bin/kinit ]; then
    # Kerberos installed
+   echo ""
 else
    echo "Kerberos Client Package not found..."
    echo "Do you want install it? n/j:"

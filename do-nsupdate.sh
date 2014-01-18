@@ -277,7 +277,7 @@ else
       case $(uname) in
       Linux)
          ### Linux ###
-         apt-get install sudo
+         /bin/su root -c "apt-get install sudo"
       ;;
       esac
       }

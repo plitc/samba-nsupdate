@@ -289,7 +289,7 @@ else
    }
 fi
 
-if [ -f /usr/sbin/samba_dnsupdate ]; then
+if [ -f /etc/init.d/samba ]; then
    # Debian derived
    echo ""
 else
@@ -318,7 +318,7 @@ else
    }
 fi
  
-if [ $SKERBEROSINIT = /usr/bin/kinit ]; then
+if [ "$SKERBEROSINIT" == "/usr/bin/kinit" ]; then
    # Kerberos installed
    echo ""
 else

@@ -243,8 +243,8 @@ SADSERVERZONE=$(grep "ADSERVERZONE" $CONFIG | /usr/bin/awk '{print $3}')
 SADMACHINETTL=$(grep "ADMACHINETTL" $CONFIG | /usr/bin/awk '{print $3}')
 SINTERFACE=$(grep "INTERFACE" $CONFIG | /usr/bin/awk '{print $3}')
 
-IPV4=$(ifconfig $SINTERFACE | grep "broadcast" | /usr/bin/awk '{print $2}' | head -n1)
-IPV6=$(ifconfig $SINTERFACE | grep "autoconf" | /usr/bin/awk '{print $2}' | head -n1)
+IPV4=$(sudo ifconfig $SINTERFACE | grep "inet" | /usr/bin/awk '{print $2}' | head -n1 | cut -d ":" -f2-)
+IPV6=$(sudo ifconfig $SINTERFACE | grep "inet6" | /usr/bin/awk '{print $2}' | head -n1 | cut -d "/" -f1)
 
 SKERBEROSINIT=$(which kinit)
 ### SADMACHINENAME=$(hostname -f)

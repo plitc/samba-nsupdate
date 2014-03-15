@@ -79,7 +79,14 @@ else
       case $(uname) in
       FreeBSD)
          ### FreeBSD ###
-         sudo pkg_add -r samba4 samba-nsupdate
+         if [ -x /usr/sbin/pkg ]
+            then
+            {
+            sudo pkg add -r samba4 samba-nsupdate
+            }
+         else
+            sudo pkg_add -r samba4 samba-nsupdate
+         fi
       ;;
       esac
       }

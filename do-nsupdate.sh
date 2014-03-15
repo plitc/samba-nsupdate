@@ -30,6 +30,12 @@
 
 rm /tmp/do-nsupdate-*
 
+mkdir -p $HOME/.config
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
+
 case $(uname) in
 FreeBSD)
     ### FreeBSD ###
@@ -37,8 +43,8 @@ FreeBSD)
 cat << 'FREEBSDEOF' > /tmp/do-nsupdate-freebsd.sh
 #!/bin/sh
 {
-FILE="$HOME/do-nsupdate.txt"
-CONFIG="$HOME/do-nsupdate.conf"
+FILE="$HOME/.config/do-nsupdate.txt"
+CONFIG="$HOME/.config/do-nsupdate.conf"
 
 SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
 SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
@@ -171,9 +177,9 @@ Darwin)
 cat << 'MACEOF' > /tmp/do-nsupdate-mac.sh
 #!/bin/sh
 {
-FILE="$HOME/do-nsupdate.txt"
-CONFIG="$HOME/do-nsupdate.conf"
-    
+FILE="$HOME/.config/do-nsupdate.txt"
+CONFIG="$HOME/.config/do-nsupdate.conf"
+ 
 SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
 SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
 SADSERVERNAME=$(grep "ADSERVERNAME" $CONFIG | /usr/bin/awk '{print $3}')
@@ -242,8 +248,8 @@ Linux)
 cat << 'LINUXEOF' > /tmp/do-nsupdate-linux.sh
 #!/bin/sh
 {
-FILE="$HOME/do-nsupdate.txt"
-CONFIG="$HOME/do-nsupdate.conf"
+FILE="$HOME/.config/do-nsupdate.txt"
+CONFIG="$HOME/.config/do-nsupdate.conf"
 
 SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
 SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')

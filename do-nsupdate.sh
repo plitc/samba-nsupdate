@@ -95,6 +95,10 @@ else
          else
             sudo pkg_add -r samba4 samba-nsupdate
          fi
+         if [ $? -ne 0 ]
+            then
+            exit 1
+         fi
       ;;
       esac
       }
@@ -159,6 +163,10 @@ case $(uname) in
 FreeBSD)
     ### FreeBSD ###
     /usr/local/bin/samba-nsupdate -g -v $FILE
+    if [ $? -ne 0 ]
+       then
+       exit 1
+    fi
     ;;
 esac
 
@@ -200,7 +208,7 @@ Darwin)
 *)
     # error 1
     echo "ERROR: Plattform=unknown"
-    exit 0
+    exit 1
     ;;
 esac
  
@@ -229,6 +237,10 @@ case $(uname) in
 Darwin)
     ### Mac ###
     /usr/bin/nsupdate -g -v $FILE
+    if [ $? -ne 0 ]
+       then
+       exit 1
+    fi
     ;;
 esac
 
@@ -271,7 +283,7 @@ Linux)
 *)
     # error 1
     echo "ERROR: Plattform=unknown"
-    exit 0
+    exit 1
     ;;
 esac
 
@@ -293,6 +305,10 @@ else
       Linux)
          ### Linux ###
          /bin/su root -c "apt-get install sudo"
+         if [ $? -ne 0 ]
+            then
+            exit 1
+         fi
       ;;
       esac
       }
@@ -322,6 +338,10 @@ else
       Linux)
          ### Linux ###
          sudo apt-get install ifconfig
+         if [ $? -ne 0 ]
+            then
+            exit 1
+         fi
       ;;
       esac
       }
@@ -351,6 +371,10 @@ else
       Linux)
          ### Linux ###
          sudo apt-get install samba dnsutils
+         if [ $? -ne 0 ]
+            then
+            exit 1
+         fi
       ;;
       esac
       }
@@ -380,6 +404,10 @@ else
       Linux)
          ### Linux ###
          sudo apt-get install krb5-user krb5-clients
+         if [ $? -ne 0 ]
+            then
+            exit 1
+         fi
       ;;
       esac
       }
@@ -416,6 +444,10 @@ case $(uname) in
 Linux)
     ### Linux ###
     /usr/bin/nsupdate -g -v $FILE
+    if [ $? -ne 0 ]
+       then
+       exit 1
+    fi
     ;;
 esac
 
@@ -432,7 +464,7 @@ exec /tmp/do-nsupdate-linux.sh
 *)
     # error 1
     echo "ERROR: Plattform = unknown"
-    exit 0
+    exit 1
     ;;
 esac
 

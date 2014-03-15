@@ -28,7 +28,9 @@
 #
 ### ### ### PLITC ### ### ###
 
-rm /tmp/do-nsupdate-*
+UNAME=$(uname)
+
+rm /tmp/do-nsupdate-${UNAME}.sh
 
 mkdir -p $HOME/.config
 if [ $? -ne 0 ]
@@ -36,11 +38,11 @@ then
     exit 1
 fi
 
-case $(uname) in
+case $UNAME in
 FreeBSD)
     ### FreeBSD ###
 ### ### ### ### ### ### ### ### ###
-cat << 'FREEBSDEOF' > /tmp/do-nsupdate-freebsd.sh
+cat << 'FREEBSDEOF' > /tmp/do-nsupdate-${UNAME}.sh
 #!/bin/sh
 {
 FILE="$HOME/.config/do-nsupdate.txt"
@@ -174,15 +176,11 @@ exit 0
 }
 FREEBSDEOF
 ### ### ### ### ### ### ### ### ###
-
-chmod 775 /tmp/do-nsupdate-freebsd.sh
-exec /tmp/do-nsupdate-freebsd.sh
-### --- --- --- --- --- --- --- ###
     ;;
 Darwin)
     ### Mac ###
 ### ### ### ### ### ### ### ### ###
-cat << 'MACEOF' > /tmp/do-nsupdate-mac.sh
+cat << 'MACEOF' > /tmp/do-nsupdate-${UNAME}.sh
 #!/bin/sh
 {
 FILE="$HOME/.config/do-nsupdate.txt"
@@ -249,15 +247,11 @@ exit 0
 }
 MACEOF
 ### ### ### ### ### ### ### ### ###
-
-chmod 775 /tmp/do-nsupdate-mac.sh
-exec /tmp/do-nsupdate-mac.sh
-### --- --- --- --- --- --- --- ###
     ;;
 Linux)
     ### Linux ###
 ### ### ### ### ### ### ### ### ###
-cat << 'LINUXEOF' > /tmp/do-nsupdate-linux.sh
+cat << 'LINUXEOF' > /tmp/do-nsupdate-${UNAME}.sh
 #!/bin/sh
 {
 FILE="$HOME/.config/do-nsupdate.txt"
@@ -456,10 +450,6 @@ exit 0
 }
 LINUXEOF
 ### ### ### ### ### ### ### ### ###
-
-chmod 775 /tmp/do-nsupdate-linux.sh
-exec /tmp/do-nsupdate-linux.sh
-### --- --- --- --- --- --- --- ###
     ;;
 *)
     # error 1
@@ -468,6 +458,10 @@ exec /tmp/do-nsupdate-linux.sh
     ;;
 esac
 
+
+chmod 775 /tmp/do-nsupdate-${UNAME}.sh
+exec /tmp/do-nsupdate-${UNAME}.sh
+### --- --- --- --- --- --- --- ###
 exit 0
 
 ### ### ### PLITC ### ### ###

@@ -14,36 +14,51 @@
 ### * Redistributions in binary form must reproduce the above copyright notice, this
 ###   list of conditions and the following disclaimer in the documentation and/or
 ###   other materials provided with the distribution.
-### 
+###
 ### THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-### ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+### ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 ### WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 ### DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-### ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
-### (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+### ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+### (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 ### LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 ### ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 ### (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ### SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#        
+#
 ### ### ### PLITC ### ### ###
 
-case $(uname) in
+UNAME=$(uname)
+
+rm /tmp/do-nsupdate-${UNAME}.sh
+
+mkdir -p $HOME/.config
+if [ $? -ne 0 ]
+then
+    exit 1
+fi
+
+case $UNAME in
 FreeBSD)
     ### FreeBSD ###
 ### ### ### ### ### ### ### ### ###
-cat << 'FREEBSDEOF' > /tmp/do-nsupdate-freebsd.sh
+cat << 'FREEBSDEOF' > /tmp/do-nsupdate-${UNAME}.sh
 #!/bin/sh
 {
-FILE="$HOME/do-nsupdate.txt"
-CONFIG="$HOME/do-nsupdate.conf"
+FILE="$HOME/.config/do-nsupdate.txt"
+CONFIG="$HOME/.config/do-nsupdate.conf"
 
-SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
-SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
-SADSERVERNAME=$(grep "ADSERVERNAME" $CONFIG | /usr/bin/awk '{print $3}')
-SADSERVERZONE=$(grep "ADSERVERZONE" $CONFIG | /usr/bin/awk '{print $3}')
-SADMACHINETTL=$(grep "ADMACHINETTL" $CONFIG | /usr/bin/awk '{print $3}')
-SINTERFACE=$(grep "INTERFACE" $CONFIG | /usr/bin/awk '{print $3}')
+if [ -f $CONFIG ]
+    then
+    SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
+    SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
+    SADSERVERNAME=$(grep "ADSERVERNAME" $CONFIG | /usr/bin/awk '{print $3}')
+    SADSERVERZONE=$(grep "ADSERVERZONE" $CONFIG | /usr/bin/awk '{print $3}')
+    SADMACHINETTL=$(grep "ADMACHINETTL" $CONFIG | /usr/bin/awk '{print $3}')
+    SINTERFACE=$(grep "INTERFACE" $CONFIG | /usr/bin/awk '{print $3}')
+else
+    echo "$CONFIG not existing"
+fi
 
 IPV4=$(ifconfig $SINTERFACE | grep "broadcast" | /usr/bin/awk '{print $2}' | head -n1)
 IPV6=$(ifconfig $SINTERFACE | grep "autoconf" | /usr/bin/awk '{print $2}' | head -n1)
@@ -58,7 +73,7 @@ FreeBSD)
 *)
     # error 1
     echo "ERROR: Plattform=unknown"
-    exit 0
+    exit 1
     ;;
 esac
 
@@ -79,7 +94,18 @@ else
       case $(uname) in
       FreeBSD)
          ### FreeBSD ###
-         sudo pkg_add -r samba4 samba-nsupdate
+         if [ -x /usr/sbin/pkg ]
+            then
+            {
+            sudo pkg add -r samba4 samba-nsupdate
+            }
+         else
+            sudo pkg_add -r samba4 samba-nsupdate
+         fi
+         if [ $? -ne 0 ]
+            then
+            exit 1
+         fi
       ;;
       esac
       }
@@ -118,9 +144,9 @@ else
    fi
    }
 fi
- 
-### <--- --- ---> ###
 
+### <--- --- ---> ###
+ 
 /usr/bin/kinit $SKERBEROSADMINUSER
 
 > $FILE
@@ -144,6 +170,10 @@ case $(uname) in
 FreeBSD)
     ### FreeBSD ###
     /usr/local/bin/samba-nsupdate -g -v $FILE
+    if [ $? -ne 0 ]
+       then
+       exit 1
+    fi
     ;;
 esac
 
@@ -151,26 +181,27 @@ exit 0
 }
 FREEBSDEOF
 ### ### ### ### ### ### ### ### ###
-
-chmod 775 /tmp/do-nsupdate-freebsd.sh
-exec /tmp/do-nsupdate-freebsd.sh
-### --- --- --- --- --- --- --- ###
     ;;
 Darwin)
     ### Mac ###
 ### ### ### ### ### ### ### ### ###
-cat << 'MACEOF' > /tmp/do-nsupdate-mac.sh
+cat << 'MACEOF' > /tmp/do-nsupdate-${UNAME}.sh
 #!/bin/sh
 {
-FILE="$HOME/do-nsupdate.txt"
-CONFIG="$HOME/do-nsupdate.conf"
-    
-SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
-SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
-SADSERVERNAME=$(grep "ADSERVERNAME" $CONFIG | /usr/bin/awk '{print $3}')
-SADSERVERZONE=$(grep "ADSERVERZONE" $CONFIG | /usr/bin/awk '{print $3}')
-SADMACHINETTL=$(grep "ADMACHINETTL" $CONFIG | /usr/bin/awk '{print $3}')
-SINTERFACE=$(grep "INTERFACE" $CONFIG | /usr/bin/awk '{print $3}')
+FILE="$HOME/.config/do-nsupdate.txt"
+CONFIG="$HOME/.config/do-nsupdate.conf"
+ 
+if [ -f $CONFIG ]
+    then
+    SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
+    SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
+    SADSERVERNAME=$(grep "ADSERVERNAME" $CONFIG | /usr/bin/awk '{print $3}')
+    SADSERVERZONE=$(grep "ADSERVERZONE" $CONFIG | /usr/bin/awk '{print $3}')
+    SADMACHINETTL=$(grep "ADMACHINETTL" $CONFIG | /usr/bin/awk '{print $3}')
+    SINTERFACE=$(grep "INTERFACE" $CONFIG | /usr/bin/awk '{print $3}')
+else
+    echo "$CONFIG not existing"
+fi
 
 IPV4=$(ifconfig $SINTERFACE | grep "broadcast" | /usr/bin/awk '{print $2}' | head -n1)
 IPV6=$(ifconfig $SINTERFACE | grep "autoconf" | /usr/bin/awk '{print $2}' | head -n1)
@@ -185,7 +216,7 @@ Darwin)
 *)
     # error 1
     echo "ERROR: Plattform=unknown"
-    exit 0
+    exit 1
     ;;
 esac
  
@@ -214,6 +245,10 @@ case $(uname) in
 Darwin)
     ### Mac ###
     /usr/bin/nsupdate -g -v $FILE
+    if [ $? -ne 0 ]
+       then
+       exit 1
+    fi
     ;;
 esac
 
@@ -222,26 +257,27 @@ exit 0
 }
 MACEOF
 ### ### ### ### ### ### ### ### ###
-
-chmod 775 /tmp/do-nsupdate-mac.sh
-exec /tmp/do-nsupdate-mac.sh
-### --- --- --- --- --- --- --- ###
     ;;
 Linux)
     ### Linux ###
 ### ### ### ### ### ### ### ### ###
-cat << 'LINUXEOF' > /tmp/do-nsupdate-linux.sh
+cat << 'LINUXEOF' > /tmp/do-nsupdate-${UNAME}.sh
 #!/bin/sh
 {
-FILE="$HOME/do-nsupdate.txt"
-CONFIG="$HOME/do-nsupdate.conf"
+FILE="$HOME/.config/do-nsupdate.txt"
+CONFIG="$HOME/.config/do-nsupdate.conf"
 
-SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
-SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
-SADSERVERNAME=$(grep "ADSERVERNAME" $CONFIG | /usr/bin/awk '{print $3}')
-SADSERVERZONE=$(grep "ADSERVERZONE" $CONFIG | /usr/bin/awk '{print $3}')
-SADMACHINETTL=$(grep "ADMACHINETTL" $CONFIG | /usr/bin/awk '{print $3}')
-SINTERFACE=$(grep "INTERFACE" $CONFIG | /usr/bin/awk '{print $3}')
+if [ -f $CONFIG ]
+    then
+    SKERBEROSADMINUSER=$(grep "KERBEROSADMINUSER" $CONFIG | /usr/bin/awk '{print $3}')
+    SADMACHINENAME=$(grep "ADMACHINENAME" $CONFIG | /usr/bin/awk '{print $3}')
+    SADSERVERNAME=$(grep "ADSERVERNAME" $CONFIG | /usr/bin/awk '{print $3}')
+    SADSERVERZONE=$(grep "ADSERVERZONE" $CONFIG | /usr/bin/awk '{print $3}')
+    SADMACHINETTL=$(grep "ADMACHINETTL" $CONFIG | /usr/bin/awk '{print $3}')
+    SINTERFACE=$(grep "INTERFACE" $CONFIG | /usr/bin/awk '{print $3}')
+else
+    echo "$CONFIG not existing"
+fi
 
 IPV4=$(sudo ifconfig $SINTERFACE | grep "inet" | /usr/bin/awk '{print $2}' | head -n1 | cut -d ":" -f2-)
 IPV6=$(sudo ifconfig $SINTERFACE | grep "inet6" | /usr/bin/awk '{print $2}' | head -n1 | cut -d "/" -f1)
@@ -256,7 +292,7 @@ Linux)
 *)
     # error 1
     echo "ERROR: Plattform=unknown"
-    exit 0
+    exit 1
     ;;
 esac
 
@@ -273,15 +309,19 @@ else
    # if [ "$answer" = "j" ]
    if [ "$answer" != "n" ]
       then
-      { 
+      {
       case $(uname) in
       Linux)
          ### Linux ###
          /bin/su root -c "apt-get install sudo"
+         if [ $? -ne 0 ]
+            then
+            exit 1
+         fi
       ;;
       esac
       }
-   else 
+   else
       echo ""
       echo "Have a nice day"
       exit 0
@@ -302,12 +342,16 @@ else
    # if [ "$answer" = "j" ]
    if [ "$answer" != "n" ]
       then
-      {  
+      {
       case $(uname) in
       Linux)
          ### Linux ###
          sudo apt-get install ifconfig
-      ;; 
+         if [ $? -ne 0 ]
+            then
+            exit 1
+         fi
+      ;;
       esac
       }
    else
@@ -336,6 +380,10 @@ else
       Linux)
          ### Linux ###
          sudo apt-get install samba dnsutils
+         if [ $? -ne 0 ]
+            then
+            exit 1
+         fi
       ;;
       esac
       }
@@ -365,6 +413,10 @@ else
       Linux)
          ### Linux ###
          sudo apt-get install krb5-user krb5-clients
+         if [ $? -ne 0 ]
+            then
+            exit 1
+         fi
       ;;
       esac
       }
@@ -401,6 +453,10 @@ case $(uname) in
 Linux)
     ### Linux ###
     /usr/bin/nsupdate -g -v $FILE
+    if [ $? -ne 0 ]
+       then
+       exit 1
+    fi
     ;;
 esac
 
@@ -409,18 +465,18 @@ exit 0
 }
 LINUXEOF
 ### ### ### ### ### ### ### ### ###
-
-chmod 775 /tmp/do-nsupdate-linux.sh
-exec /tmp/do-nsupdate-linux.sh
-### --- --- --- --- --- --- --- ###
     ;;
 *)
     # error 1
     echo "ERROR: Plattform = unknown"
-    exit 0
+    exit 1
     ;;
 esac
-   
+
+
+chmod 775 /tmp/do-nsupdate-${UNAME}.sh
+exec /tmp/do-nsupdate-${UNAME}.sh
+### --- --- --- --- --- --- --- ###
 exit 0
 
 ### ### ### PLITC ### ### ###

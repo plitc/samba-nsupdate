@@ -60,7 +60,7 @@ FreeBSD)
 *)
     # error 1
     echo "ERROR: Plattform=unknown"
-    exit 0
+    exit 1
     ;;
 esac
 

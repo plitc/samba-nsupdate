@@ -1,5 +1,5 @@
 #!/bin/sh
-#
+
 ### ### ### PLITC ### ### ###
 #
 ### Copyright (c) 2014, Daniel Plominski (Plominski IT Consulting)
@@ -30,9 +30,9 @@
 
 UNAME=$(uname)
 
-rm /tmp/do-nsupdate-${UNAME}.sh
+rm /tmp/do-nsupdate-"${UNAME}".sh
 
-mkdir -p $HOME/.config
+mkdir -p "$HOME"/.config
 if [ $? -ne 0 ]
 then
     exit 1
@@ -474,8 +474,8 @@ LINUXEOF
 esac
 
 
-chmod 775 /tmp/do-nsupdate-${UNAME}.sh
-exec /tmp/do-nsupdate-${UNAME}.sh
+chmod 775 /tmp/do-nsupdate-"${UNAME}".sh
+exec /tmp/do-nsupdate-"${UNAME}".sh
 ### --- --- --- --- --- --- --- ###
 exit 0
 
